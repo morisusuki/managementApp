@@ -96,15 +96,16 @@ public class AttendanceDAO {
 		attendanceRecords.add(newRecord);
 	}
 	
+	//勤怠時刻の編集
 	public boolean updateManualAttendance
-			(String userId, LocalDateTime oldCheckIn,LocalDateTime oldCheckOut,
+			(String userId, LocalDateTime oldCheckIn, LocalDateTime oldCheckOut,
 			LocalDateTime newCheckIn, LocalDateTime newCheckOut) {
 		for (int i = 0; i < attendanceRecords.size(); i++) {
 			Attendance att = attendanceRecords.get(i);
 			if (att.getUserId().equals(userId) &&
 				att.getCheckInTime().equals(oldCheckIn) &&
-				(att.getCheckOutTime() == null ?
-						oldCheckOut == null : att.getCheckOutTime().equals(oldCheckOut))) {
+					(att.getCheckOutTime() == null ?
+					oldCheckOut == null : att.getCheckOutTime().equals(oldCheckOut))) {
 				att.setCheckInTime(newCheckIn);
 				att.setCheckOutTime(newCheckOut);
 				return true;
@@ -113,6 +114,7 @@ public class AttendanceDAO {
 		return false;
 	}
 	
+	//勤怠記録の削除
 	public boolean deleteManualAttendance
 			(String userId, LocalDateTime checkIn, LocalDateTime checkOut) {
 		return attendanceRecords.removeIf(att ->
