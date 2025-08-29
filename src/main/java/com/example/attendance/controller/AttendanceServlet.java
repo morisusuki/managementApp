@@ -2,6 +2,7 @@ package com.example.attendance.controller;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+import org.apache.catalina.User;
 import org.apache.naming.java.javaURLContextFactory;
 
 import com.example.attendance.dao.AttendanceDAO;
@@ -27,7 +29,7 @@ public class AttendanceServlet extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
+										throws ServletException, IOException {
 		String action = req.getParameter("action");
 		HttpSession session = req.getSession(false);
 		User user = (User) session.getAttribute("user");
@@ -115,8 +117,51 @@ public class AttendanceServlet extends HttpServlet {
 	}
 // p42DoPost前まで
 
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		doGet(request, response);
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+										throws ServletException, IOException {
+		HttpSession session = req.getSession(false);
+		User user = (User) session.getAttribute("user");
+		
+		if (user == nul) {
+			resp.sendRedirect("login.jsp");
+			return;
+		}
+		
+		String action = req.getParameter("action");
+		
+		if ("check_in".equals(action)) {
+			attendanceDAO.checkIn(user.getUsername());
+			session.setAttribute("successMessage", "出勤を記録しました");
+		} else if ("check_out".equals(action)) {
+			attendanceDAO.checkOut(user.getUsername());
+			session.setAttribute("seccessMessage", "退勤を記録しました");
+		} else if ("add_manual".equals(action) && "admin".equals(user.getRoles())) {
+			String userId = req.getParameter("userId");
+			String checkInStr = req.getParameter("checkInTime");
+			String checkOutStr = req.getParameter("checkOutTime");
+			
+			try {
+				LocalDateTime checkIn = LocalDateTime.parse(checkOutStr);
+				LocalDateTime checkOut = checkOutStr != null &&
+										!checkOutStr.isEmpty() ? LocalDateTime.parse(checkOutStr) :null;
+			attendanceDAO.addManualAttendance(userId, checkIn, checkOut);
+			session.setAttribute("successMessage", "勤怠管理を手動で追加しました");
+			} catch (DateTimeParseException e) {
+				session.setAttribute("errorMessage", "日付/時刻の形式が不正です");
+			}
+		} else if ("update_manual".equals(action) && "admin".equals(user.getRoles())) {
+			String userId = req.getParameter("userId");
+			LocalDateTime oldCheckIn =
+					LocalDateTime.parse(req.getParameter("oldCheckInTime"));
+			LocalDateTime oldCheckOut = req.getParameter("oldCheckOutTime") != null &&
+										!req.getParameter("olcCheckOutTime").isEmpty() ?
+										LocalDateTime.parse(req.getParameter("oldCheckOutTime")) : null;
+			LocalDateTime newCheckIn = LocalDateTime.parse(req.getParameter("newCheckInTime"));
+			LocalDateTime newCheckOut = req.getParameter("newCheckOutTime") != null &&
+										!req.getParameter("newCheckOutTime").isEmpty() ?
+										LocalDateTime.parse(req.getParameter("newCheckOutTime") : null ;)
+		//p43 10行目まで
+		}
 	}
 
 }
