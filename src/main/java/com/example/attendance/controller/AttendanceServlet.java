@@ -1,8 +1,10 @@
 package com.example.attendance.controller;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
@@ -16,11 +18,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-import org.apache.catalina.User;
-import org.apache.naming.java.javaURLContextFactory;
-
 import com.example.attendance.dao.AttendanceDAO;
 import com.example.attendance.dto.Attendance;
+import com.example.attendance.dto.User;
 
 
 @WebServlet("/AttendanceServlet")
@@ -68,14 +68,14 @@ public class AttendanceServlet extends HttpServlet {
 			}
 			
 			List<Attendance> filteredRecords =
-					AttendanceDAO.findFilteredRecords(filterUserId, startDate, endDate);
+					attendanceDAO.findFilteredRecords(filterUserId, startDate, endDate);
 			req.setAttribute("allAttendanceRecords", filteredRecords);
 			
 			Map<String, Long> totalHoursByUser =
 					filteredRecords.stream().collect(Collectors.groupingBy(
 						Attendance::getUserId, Collectors.summingLong(att -> {
 							if (att.getCheckInTime() != null && att.getCheckOutTime() != null) {
-								return javaURLContextFactory.time.temporal.ChronoUntit.HOUSE.between(
+								return java.time.temporal.ChronoUnit.HOURS.between(
 									   att.getCheckInTime(), att.getCheckOutTime());
 							}
 							return 0L;
@@ -106,11 +106,11 @@ public class AttendanceServlet extends HttpServlet {
 				req.setAttribute("totalHoursByUser", totalHoursByUser);
 				req.setAttribute("monthlyWorkingHours", attendanceDAO.getMonthlyWorkingHours(null));
 				
-				RequestDispatcher rd = RequestDispatcher.getRequestDispatcher("/jsp/admin_menu.jsp");
+				RequestDispatcher rd = req.getRequestDispatcher("/jsp/admin_menu.jsp");
 				rd.forward(req, resp);
 			} else {
-				req.setAttribute("attendanceRecords", AttendanceDAO.findByUserId(user.getUsername()));
-				RequestDispatcher rd = RequestDispatcher.getRequestDispatcher("/jsp/employee_menu.jsp");
+				req.setAttribute("attendanceRecords", attendanceDAO.findByUserId(user.getUsername()));
+				RequestDispatcher rd = req.getRequestDispatcher("/jsp/employee_menu.jsp");
 				rd.forward(req, resp);
 			}
 		}
@@ -122,7 +122,7 @@ public class AttendanceServlet extends HttpServlet {
 		HttpSession session = req.getSession(false);
 		User user = (User) session.getAttribute("user");
 		
-		if (user == nul) {
+		if (user == null) {
 			resp.sendRedirect("login.jsp");
 			return;
 		}
@@ -135,7 +135,7 @@ public class AttendanceServlet extends HttpServlet {
 		} else if ("check_out".equals(action)) {
 			attendanceDAO.checkOut(user.getUsername());
 			session.setAttribute("seccessMessage", "退勤を記録しました");
-		} else if ("add_manual".equals(action) && "admin".equals(user.getRoles())) {
+		} else if ("add_manual".equals(action) && "admin".equals(user.getRole())) {
 			String userId = req.getParameter("userId");
 			String checkInStr = req.getParameter("checkInTime");
 			String checkOutStr = req.getParameter("checkOutTime");
@@ -149,7 +149,7 @@ public class AttendanceServlet extends HttpServlet {
 			} catch (DateTimeParseException e) {
 				session.setAttribute("errorMessage", "日付/時刻の形式が不正です");
 			}
-		} else if ("update_manual".equals(action) && "admin".equals(user.getRoles())) {
+		} else if ("update_manual".equals(action) && "admin".equals(user.getRole())) {
 			String userId = req.getParameter("userId");
 			LocalDateTime oldCheckIn =
 					LocalDateTime.parse(req.getParameter("oldCheckInTime"));
@@ -159,9 +159,76 @@ public class AttendanceServlet extends HttpServlet {
 			LocalDateTime newCheckIn = LocalDateTime.parse(req.getParameter("newCheckInTime"));
 			LocalDateTime newCheckOut = req.getParameter("newCheckOutTime") != null &&
 										!req.getParameter("newCheckOutTime").isEmpty() ?
-										LocalDateTime.parse(req.getParameter("newCheckOutTime") : null ;)
+										LocalDateTime.parse(req.getParameter("newCheckOutTime")) : null ;
 		//p43 10行目まで
+			if (attendanceDAO.updateManualAttendance
+					(userId, oldCheckIn, oldCheckOut, newCheckIn, newCheckOut)) {
+				session.setAttribute("successMessage", "勤怠記録を手動で更新しました");
+			} else {
+				session.setAttribute("errorMessage", "勤怠記録の更新に失敗しました");
+			}
+		} else if ("delete_manual".equals(action) && "admin".equals(user.getRole())) {
+			String userId = req.getParameter("userId");
+			LocalDateTime checkIn = LocalDateTime.parse(req.getParameter("checkInTime"));
+			LocalDateTime checkOut =req.getParameter("checkOutTime") != null 
+							&& !req.getParameter("checkOutTime").isEmpty() ?
+									LocalDateTime.parse(req.getParameter("checkOutTime")) : null;
+			
+			if (attendanceDAO.deleteManualAttendance(userId, checkIn, checkOut)) {
+				session.setAttribute("successMessage", "勤怠記録を削除しました");
+			} else {
+				session.setAttribute("errorMessage","勤怠記録の削除に失敗しました");
+			}
+		}
+		
+		if ("admin".equals(user.getRole())) {
+			resp.sendRedirect("attendance?action=filter&filterUserId" +
+					(req.getParameter("filterUserId") != null ? req.getParameter("filterUserId") :"") +
+					"&startDate=" + (req.getParameter(("startDate") != null ? req.getParameter("startDate") : "") +
+					"endDate=" + (req.getParameter("endDate")) != null ? req.getParameter("endDate") : ""));
+		} else {
+			resp.sendRedirect("attendance");
 		}
 	}
-
+	
+	private void exportCsv(HttpServletRequest request, HttpServletResponse resp)
+															throws IOException {
+		resp.setContentType("text/csv; charset=UTF-8");
+		resp.setHeader("Content-Disposition", "attachment; filename=\"attendance_records.csv\"");
+		
+		PrintWriter writer = resp.getWriter();
+		writer.append("User ID, Check-in Time, Check-out Time\n");
+		
+		String filterUserId = request.getParameter("filterUserId");
+		String startDateStr = request.getParameter("startDate");
+		String endDateStr = request.getParameter("endDate");
+		LocalDate startDate = null;
+		LocalDate endDate = null;
+		
+		try {
+			if (startDateStr != null && !startDateStr.isEmpty()) {
+				startDate = LocalDate.parse(startDateStr);
+			}
+			if (endDateStr != null && ! endDateStr.isEmpty()) {
+				endDate = LocalDate.parse(endDateStr);
+			}
+ 		}catch (DateTimeParseException e) {
+			System.err.println("Invalid date format for CSV export: " + e.getMessage());
+		}
+		
+		List<Attendance> records =
+				attendanceDAO.findFilteredRecords(filterUserId, startDate, endDate);
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		
+		for (Attendance record : records) {
+			writer.append(String.format(
+					"%s,%s,%s\n",
+					record.getUserId(),
+					record.getCheckInTime() != null ?
+						record.getCheckInTime().format(formatter) : "",
+					record.getCheckOutTime() != null ?
+						record.getCheckOutTime().format(formatter) : ""));
+		}
+		writer.flush();
+	}
 }

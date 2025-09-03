@@ -96,7 +96,7 @@ public class AttendanceDAO {
 		attendanceRecords.add(newRecord);
 	}
 	
-	//勤怠時刻の編集
+	//勤怠時刻の編集 上手くできたらtrueを返す
 	public boolean updateManualAttendance
 			(String userId, LocalDateTime oldCheckIn, LocalDateTime oldCheckOut,
 			LocalDateTime newCheckIn, LocalDateTime newCheckOut) {
