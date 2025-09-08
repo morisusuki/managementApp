@@ -10,25 +10,21 @@
 <body>
 	<div class="container">
 		<h1>勤怠管理システム</h1>
-		<form action="login"
+		<form action="login" method="post">
 			<p>
-method="post">
-<label for="username">ユーザーID:</label>
-<input type="text" id="username
-"
-name="username
-"
-required>
-</p>
+				<label for="username">ユーザーID:</label> 
+				<input type="text" id="username"
+						name="username" required>
+			</p>
 			<p>
-<label for="password">パスワード:</label>
-<input type="password" id="password"
-name="password"
-required>
-</p>
+				<label for="password">パスワード:</label> 
+				<input type="password"
+						id="password" name="password" required>
+			</p>
 			<div class="button-group">
-<input type="submit" value="ログイン">
-</div></form>
+				<input type="submit" value="ログイン">
+			</div>
+		</form>
 		<p class="error-message">
 			<c:out value="${errorMessage}" />
 		</p>
@@ -36,8 +32,7 @@ required>
 			<p class="success-message">
 				<c:out value="${sessionScope.successMessage}" />
 			</p>
-			<c:remove var="successMessage
-" scope="session" />
+			<c:remove var="successMessage" scope="session" />
 		</c:if>
 	</div>
 </body>
