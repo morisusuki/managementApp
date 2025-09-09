@@ -10,7 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 
-@WebServlet("/LogoutServlet")
+@WebServlet("/logout")
 public class LogoutServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -19,6 +19,6 @@ public class LogoutServlet extends HttpServlet {
 		if (session != null) {
 			session.invalidate();
 		}
-		resp.sendRedirect("/login.jsp");
+		resp.sendRedirect("login");
 	}
 }

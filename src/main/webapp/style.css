@@ -50,7 +50,6 @@ input[type="email"],
 input[type="datetime-local"],
 input[type="date"],
 textarea,
-
 select {
 	width: calc(100% - 24px);
 	padding: 12px;

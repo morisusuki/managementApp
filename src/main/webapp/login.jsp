@@ -10,7 +10,7 @@
 <body>
 	<div class="container">
 		<h1>勤怠管理システム</h1>
-		<form action="login" method="post">
+		<form action="./LoginServlet" method="post">
 			<p>
 				<label for="username">ユーザーID:</label> 
 				<input type="text" id="username"
