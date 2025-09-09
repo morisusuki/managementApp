@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,7 +16,6 @@ import com.example.attendance.dao.UserDAO;
 import com.example.attendance.dto.User;
 
 
-@WebServlet("/LoginServlet")
 public class LoginServlet extends HttpServlet {
 	private final UserDAO userDAO = new UserDAO();
 	private final AttendanceDAO attendanceDAO = new AttendanceDAO();

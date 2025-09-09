@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,8 +21,6 @@ import com.example.attendance.dao.AttendanceDAO;
 import com.example.attendance.dto.Attendance;
 import com.example.attendance.dto.User;
 
-
-@WebServlet("/AttendanceServlet")
 public class AttendanceServlet extends HttpServlet {
 	private final AttendanceDAO attendanceDAO = new AttendanceDAO();
 
@@ -141,7 +138,7 @@ public class AttendanceServlet extends HttpServlet {
 			String checkOutStr = req.getParameter("checkOutTime");
 			
 			try {
-				LocalDateTime checkIn = LocalDateTime.parse(checkOutStr);
+				LocalDateTime checkIn = LocalDateTime.parse(checkInStr);
 				LocalDateTime checkOut = checkOutStr != null &&
 										!checkOutStr.isEmpty() ? LocalDateTime.parse(checkOutStr) :null;
 			attendanceDAO.addManualAttendance(userId, checkIn, checkOut);
