@@ -27,7 +27,7 @@ public class UserServlet extends HttpServlet {
 		User currentUser = (User) session.getAttribute("user");
 		
 		if (currentUser == null || !"admin".equals(currentUser.getRole())) {
-			resp.sendRedirect("login.jsp");
+			resp.sendRedirect("/login.jsp");
 			return;
 		}
 		
@@ -63,7 +63,7 @@ public class UserServlet extends HttpServlet {
 		User currentUser = (User) session.getAttribute("user");
 		
 		if (currentUser == null || !"admin".equals(currentUser.getRole())) {
-			resp.sendRedirect("login.jsp");
+			resp.sendRedirect("/login.jsp");
 			return;
 		}
 		if ("add".equals(action)) {

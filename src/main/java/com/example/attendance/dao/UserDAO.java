@@ -15,7 +15,7 @@ public class UserDAO {
 	//初期ユーザーの設定
 	static {
 		users.put("oomori", new User("oomori", hashPassword("morimori"), "employee", true));
-		users.put("admin1", new User("admin1", hashPassword("daminpass"), "admin", true));
+		users.put("admin1", new User("admin1", hashPassword("adminpass"), "admin", true));
 	}
 	
 	//与えられたユーザー名からユーザー情報を取得
