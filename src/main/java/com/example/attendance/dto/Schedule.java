@@ -19,8 +19,16 @@ public class Schedule {
 		return userId;
 	}
 	
-	public LocalDateTime getDate() {
+	public LocalDateTime getScheduleDate() {
 		return date;
+	}
+	
+	public int getScheduleYear() {
+		return date.getYear();
+	}
+	
+	public int getScheduleMonth() {
+		return date.getMonth().getValue();
 	}
 		
 }

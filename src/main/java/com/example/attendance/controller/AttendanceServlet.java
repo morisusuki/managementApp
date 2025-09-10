@@ -34,11 +34,11 @@ public class AttendanceServlet extends HttpServlet {
 			resp.sendRedirect("login.jsp");
 			return;
 		}
-//		String message = (String) session.getAttribute("successMessage");
-//		if (message != null) {
-//			req.setAttribute("successMessage", message);
-//			session.removeAttribute("successMessage");
-//		}
+		String message = (String) session.getAttribute("successMessage");
+		if (message != null) {
+			req.setAttribute("successMessage", message);
+			session.removeAttribute("successMessage");
+		}
 		if ("export_csv".equals(action) && "admin".equals(user.getRole())) {
 			exportCsv(req, resp);
 		} else if ("filter".equals(action) && "admin".equals(user.getRole())) {

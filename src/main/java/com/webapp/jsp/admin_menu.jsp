@@ -12,8 +12,9 @@
 		<h1>管理者メニュー</h1>
 		<p>ようこそ, ${user.username}さん (管理者)</p>
 		<div class="main-nav">
-			<a href="attendance?action=filter">勤怠履歴管理</a> <a
-				href="users?action=list">ユーザー管理</a> <a href="../logout">ログアウト</a>
+			<a href="attendance?action=filter">勤怠履歴管理</a>
+			 <a href="users?action=list">ユーザー管理</a> 
+			<a href="logout">ログアウト</a>
 		</div>
 		<c:if test="${not empty sessionScope.successMessage}">
 			<p class="success-message">
@@ -43,13 +44,13 @@
 		<p class="error-message">
 			<c:out value="${errorMessage}" />
 		</p>
-<%-- 	<a href="attendance?action=export_csv&filterUserId=
+	 	<a href="attendance?action=export_csv&filterUserId=
 			<c:out value="${param.filterUserId}"/>&startDate=
 			<c:out value="${param.startDate}"/>&endDate=
 			<c:out value="${param.endDate}"/>"
 			class="button">
 			勤怠履歴を CSV エクスポート
-		</a> --%>
+		</a>
 		<h3>勤怠サマリー (合計労働時間)</h3>
 		<table class="summary-table">
 			<thead>
@@ -134,8 +135,7 @@
 			</p>
 			<p>
 				<label for="manualCheckInTime">出勤時刻:</label> <input
-					type="datetime-local" id="manualCheckInTime" name="checkInTime"
-					required>
+					type="datetime-local" id="manualCheckInTime" name="checkInTime"　required>
 			</p>
 			<p>
 				<label for="manualCheckOutTime">退勤時刻 (任意):</label> <input
