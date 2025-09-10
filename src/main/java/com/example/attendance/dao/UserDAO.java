@@ -1,5 +1,4 @@
 package com.example.attendance.dao;
-
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
@@ -7,15 +6,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.example.attendance.dto.User;
-
 public class UserDAO {
 	//ユーザー情報がまとめられたリスト(ユーザー名, User型の情報)
 	private static final Map<String, User> users = new HashMap<>();
 	
 	//初期ユーザーの設定
 	static {
-		users.put("oomori", new User("oomori", hashPassword("morimori"), "employee", true));
 		users.put("admin1", new User("admin1", hashPassword("adminpass"), "admin", true));
+//		users.put("employee1", new User("employee1", hashPassword("password"), "employee", true));
 	}
 	
 	//与えられたユーザー名からユーザー情報を取得
@@ -26,8 +24,7 @@ public class UserDAO {
 	//与えられたパスワードが一致するか比較
 	public boolean verifyPassword(String username, String password) {
 		User user = findByUsername(username);
-		return user!= null && user.isEnabled() &&
-			   user.getPassword().equals(hashPassword(password));
+		return user != null && user.isEnabled() && user.getPassword().equals(hashPassword(password));
 	}
 	
 	//全ユーザー情報をリストで渡す
@@ -50,21 +47,21 @@ public class UserDAO {
 		users.remove(username);
 	}
 	
-	//新しいパスワードを設定(旧パスワードとの比較はしない)
+	//新しいパスワードを設定
 	public void resetPassword(String username, String newPassword) {
 		User user = users.get(username);
 		if (user != null) {
-			users.put(username,  new User(
-				user.getUsername(), hashPassword(newPassword),
-				user.getRole(), user.isEnabled()));
+			users.put(username, new User(user.getUsername(), hashPassword(newPassword), user.getRole(),
+					user.isEnabled()));
 		}
 	}
+	
 	//ユーザーアカウントの有効/無効を切り替える
 	public void toggleUserEnabled(String username, boolean enabled) {
 		User user = users.get(username);
-		if (user!= null) {
-			users.put(username, new User(user.getUsername(),
-					  user.getPassword(), user.getRole(), enabled));
+		if (user != null) {
+			users.put(username, new User(user.getUsername(), user.getPassword(), user.getRole(),
+					enabled));
 		}
 	}
 	
@@ -73,7 +70,7 @@ public class UserDAO {
 		try {
 			MessageDigest md = MessageDigest.getInstance("SHA-256");
 			byte[] hashedBytes = md.digest(password.getBytes());
-			StringBuffer sb = new StringBuffer();
+			StringBuilder sb = new StringBuilder();
 			for (byte b : hashedBytes) {
 				sb.append(String.format("%02x", b));
 			}
@@ -82,5 +79,4 @@ public class UserDAO {
 			throw new RuntimeException(e);
 		}
 	}
-
 }

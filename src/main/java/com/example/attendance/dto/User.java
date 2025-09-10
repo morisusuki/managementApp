@@ -1,17 +1,17 @@
 package com.example.attendance.dto;
 
 public class User {
+	
 	private String username;
 	private String password;
 	private String role;
-	private boolean enabled;
+	private boolean enabled; // New field
 	
 	public User(String username, String password, String role) {
-		this(username, password, role, true);
+		this(username, password, role, true); // Default to enabled
 	}
 	
-	public User(
-			String username, String password,
+	public User(String username, String password,
 			String role, boolean enabled) {
 		this.username = username;
 		this.password = password;
@@ -38,5 +38,4 @@ public class User {
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
-
 }

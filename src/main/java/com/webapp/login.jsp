@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c
+"%>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -13,13 +14,11 @@
 		<form action="login" method="post">
 			<p>
 				<label for="username">ユーザーID:</label> 
-				<input type="text" id="username"
-						name="username" required>
+				<input type="text" id="username" name="username" required>
 			</p>
 			<p>
 				<label for="password">パスワード:</label> 
-				<input type="password"
-						id="password" name="password" required>
+				<input type="password" id="password" name="password" required>
 			</p>
 			<div class="button-group">
 				<input type="submit" value="ログイン">
@@ -35,5 +34,6 @@
 			<c:remove var="successMessage" scope="session" />
 		</c:if>
 	</div>
+	<!-- この下にカレンダー導入予定 -->
 </body>
 </html>
