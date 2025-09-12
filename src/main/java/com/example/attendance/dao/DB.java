@@ -5,18 +5,21 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DB {
-	private static final String URL  = "jdbc:postgresql:managementdb";
+	private static final String URL  = "jdbc:postgresql://localhost:5432/managementdb";
 	private static final String USER = "postgres";
 	private static final String PASS = "postgres";
 
 	static {
-		try { Class.forName("org.postgresql.Driver"); }
-		catch (ClassNotFoundException e) {
-			throw new RuntimeException("PostgreSQL JDBCドライバが見つかりません（WEB-INF/libにjarを配置してください）", e);
+		try { 
+			Class.forName("org.postgresql.Driver"); 
+			System.out.println("PostgreSQLと連携に成功");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			throw new RuntimeException("ドライバのロードに失敗しました", e);
 		}
 	}
 
-	public static Connection get() throws SQLException {
+	public static Connection getConnection() throws SQLException {
 		return DriverManager.getConnection(URL, USER, PASS);
 	}
 }
