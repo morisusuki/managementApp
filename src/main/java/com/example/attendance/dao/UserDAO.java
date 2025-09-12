@@ -7,6 +7,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -66,17 +67,50 @@ public class UserDAO {
 	
 	//全ユーザー情報をリストで渡す
 	public Collection<User> getAllUsers()  throws SQLException{
-		return users.values();
+		
+		String sql = "SELECT * FROM users";
+		try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+			ResultSet rs = ps.executeQuery();
+			Collection<User> list= new ArrayList<>();
+			while (rs.next()) {
+				list.add(map(rs));
+			}
+		} catch (SQLException e) {
+				e.printStackTrace();
+		}
+		return null;
 	}
 	
 	//新規ユーザーの追加
 	public void addUser(User user)  throws SQLException {
-		users.put(user.getUsername(), user);
+//		users.put(user.getUsername(), user);
+		
+		String sql = "INSERT INTO users(username,password,role,enabled) VALUES(?,?,?,?)";
+		try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+			ps.setString(1, user.getUsername());
+			ps.setString(2, user.getPassword());
+			ps.setString(3, user.getRole());
+			ps.setBoolean(4, true);
+			ps.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
 	}
 	
 	//既存ユーザー情報の更新
-	public void updateUser(User user)  throws SQLException{
-		users.put(user.getUsername(), user);
+	public void updateUser(User user, User oldUser)  throws SQLException{
+//		users.put(user.getUsername(), user);
+		String sql = "UPDATE users SET username = ?, role = ?, enabled = ? WHERE username = ?";
+		try (Connection con = getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+			ps.setString(1, user.getUsername());
+			ps.setString(2, user.getRole());
+			ps.setBoolean(3, user.isEnabled());
+			ps.setString(4, oldUser.getUsername());
+			ps.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	//既存ユーザーの削除
