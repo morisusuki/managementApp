@@ -7,8 +7,13 @@ public class Attendance {
 	private LocalDateTime checkInTime;
 	private LocalDateTime checkOutTime;
 	
-	public Attendance(String userId) {
+//	public Attendance(String userId) {
+//		this.userId = userId;
+//	}
+	public Attendance(String userId, Object checkInTime, Object checkOutTime) {
 		this.userId = userId;
+		this.checkInTime = checkInTime;
+		this.checkOutTime = checkOutTime;
 	}
 	public String getUserId() {
 		return userId;
