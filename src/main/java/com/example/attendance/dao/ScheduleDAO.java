@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
@@ -16,20 +15,19 @@ public class ScheduleDAO {
 	
 	//　テスト
 	static {
-		Random ran = new Random();
-		for (int i = 0; i < 5; i++) {
-			int y = ran.nextInt(6);
-			int m = ran.nextInt(11) + 1;
-			int d = ran.nextInt(29) + 1;
-			Schedule s1 = new Schedule("mori", LocalDateTime.of(2020 + y, m, d, 17, 00, 00));
-			
-			scheduleList.add(s1);
-		}	
+//		Random ran = new Random();
+//		for (int i = 0; i < 5; i++) {
+//			int y = ran.nextInt(6);
+//			int m = ran.nextInt(11) + 1;
+//			int d = ran.nextInt(29) + 1;
+//			Schedule s1 = new Schedule("mori", LocalDateTime.of(2020 + y, m, d, 17, 00, 00));
+//			
+//			scheduleList.add(s1);
+//		}
 		Schedule s1 = new Schedule("mori", LocalDateTime.of(2025, 9, 10, 17, 00, 00));
 		scheduleList.add(s1);
-		if (scheduleList.size() > 0) {
-			System.out.println(scheduleList);
-		}
+		Schedule s2 = new Schedule("mori", LocalDateTime.of(2025, 9, 11, 17, 00, 00));
+		scheduleList.add(s2);
 	}
 //	static {
 //		users.put("admin1", new User("admin1", hashPassword("adminpass"), "admin", true));

@@ -51,6 +51,7 @@
 		</table>
 		<div class="button-group">
 			<a href="logout" class="button secondary">ログアウト</a>
+			<a href="schedule" class="button secondary">シフト表</a>
 		</div>
 	</div>
 </body>

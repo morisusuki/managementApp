@@ -31,7 +31,8 @@ public class ScheduleServlet extends HttpServlet {
 			return;
 		}
 		
-		List<Schedule> scheduleList = scheduleDAO.monthSchedule();
+//		List<Schedule> scheduleList = scheduleDAO.monthSchedule();
+		List<Schedule> scheduleList = scheduleDAO.allSchedule();
 		req.setAttribute("scheduleList", scheduleList);
 		RequestDispatcher rd = req.getRequestDispatcher("/jsp/schedule_list.jsp");
 		rd.forward(req, resp);

@@ -192,8 +192,7 @@ public class AttendanceServlet extends HttpServlet {
 		} catch (DateTimeParseException e) {
 			System.err.println("Invalid date format for CSV export: " + e.getMessage());
 		}
-		List<Attendance> records = attendanceDAO.findFilteredRecords(filterUserId, startDate,
-				endDate);
+		List<Attendance> records = attendanceDAO.findFilteredRecords(filterUserId, startDate, endDate);
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		for (Attendance record : records) {
 			writer.append(String.format("%s,%s,%s\n",
