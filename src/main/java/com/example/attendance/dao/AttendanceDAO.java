@@ -242,18 +242,17 @@ public class AttendanceDAO {
 	//勤怠記録の削除
 	public boolean deleteManualAttendance(String userId, LocalDateTime checkIn, 
 										LocalDateTime checkOut) throws SQLException {
-//		return attendanceRecords.removeIf(att ->
-//		att.getUserId().equals(userId) &&
-//		att.getCheckInTime().equals(checkIn) &&
-//		(att.getCheckOutTime() == null ? checkOut == null : att.getCheckOutTime().equals(checkOut))
-//				);
 		
-		String sql = "DELETE FROM attendance WHERE userid = ? AND checkintime=? AND checkouttime=?";
+		String sql = "DELETE FROM attendance WHERE userid = ? AND checkintime=? AND checkouttime";
+		if (checkOut == null) { sql += " IS NULL"; }
+		else { sql += " = ?"; }
 	try (Connection con = DB.getConnection(); 
 			PreparedStatement ps = con.prepareStatement(sql)){
 		ps.setString(1, userId);
 		ps.setTimestamp(2, Timestamp.valueOf(checkIn));
-		ps.setTimestamp(3, Timestamp.valueOf(checkOut));
+		if (checkOut != null) { 
+			ps.setTimestamp(3, Timestamp.valueOf(checkOut));			
+		}
 		ps.executeUpdate();
 		return true;
 	} catch (SQLException e) {

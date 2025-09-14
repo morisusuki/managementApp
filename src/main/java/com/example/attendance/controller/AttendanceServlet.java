@@ -60,13 +60,11 @@ public class AttendanceServlet extends HttpServlet {
 				} catch (DateTimeParseException e) {
 					req.setAttribute("errorMessage", "日付の形式が不正です。");
 				}
-				System.out.println("filterUserId :" + filterUserId);
 				if (filterUserId != null && filterUserId.isEmpty()) { filterUserId = null;}
 				if (filterUserId != null && startDateStr.isEmpty()) { startDate = null;}
 				if (filterUserId != null && endDateStr.isEmpty()) { endDate = null;}
 				List<Attendance> filteredRecords = attendanceDAO.findFilteredRecords(filterUserId,
 						startDate, endDate);
-				System.out.println(filteredRecords);
 				req.setAttribute("allAttendanceRecords", filteredRecords);
 				Map<String, Long> totalHoursByUser = attendanceDAO.totalHoursByUser();
 //						filteredRecords.stream()

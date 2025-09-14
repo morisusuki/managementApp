@@ -110,10 +110,9 @@
 							<form action="attendance" method="post" style="display: inline;">
 								<input type="hidden" name="action" value="delete_manual">
 								<input type="hidden" name="userId" value="${att.userId}">
-								<input type="hidden" name="checkInTime"
-									value="${att.checkInTime}"> <input type="hidden"
-									name="checkOutTime" value="${att.checkOutTime}"> <input
-									type="submit" value="削除" class="button danger"
+								<input type="hidden" name="checkInTime" value="${att.checkInTime}"> 
+								<input type="hidden"name="checkOutTime" value="${att.checkOutTime}"> 
+								<input type="submit" value="削除" class="button danger"
 									onclick="return confirm('本当にこの勤怠記録を削除しますか？');">
 							</form>
 						</td>
