@@ -28,18 +28,18 @@
 			<c:if test="${userToEdit != null}">
 				<input type="hidden" name="username" value="${userToEdit.username}">
 			</c:if>
-			<label for="username">ユーザーID:</label> <input type="text"
-				id="username" name="username"
+			<label for="username">ユーザーID:</label>
+			<input type="text" id="username" name="username"
 				value="<c:out value="${userToEdit.username}"/>"
 				<c:if test="${userToEdit != null}">readonly</c:if> required>
-			<label for="password">パスワード:</label> <input type="password"
-				id="password" name="password"
-				<c:if test="${userToEdit == null}">required</c:if>>
-			<c:if test="${userToEdit != null}">
+			<label for="password">パスワード:</label> 
+			<input type="password" id="password" name="password">
+				<%-- <c:if test="${userToEdit == null}">required</c:if>> --%>
+<%-- 			<c:if test="${userToEdit != null}">
 				<p class="error-message">
 					※編集時はパスワードは変更されません。リセットする場合は別途操作してください。
 				</p>
-			</c:if>
+			</c:if> --%>
 			<label for="role">役割:</label> <select id="role" name="role" required>
 				<option value="employee"
 					<c:if test="${userToEdit.role == 'employee'}">selected</c:if>>従業員</option>
@@ -54,15 +54,15 @@
 			<div class="button-group">
 				<input type="submit"
 					value="<c:choose><c:when test="${userToEdit != null}">更新</c:when><c:otherwise>追加</c:otherwise></c:choose>">
-					<c:if test="${userToEdit != null}">
-						<form action="users" method="post" style="display: inline;">
-							<input type="hidden" name="action" value="reset_password">
-							<input type="hidden" name="username" value="${userToEdit.username}"> 
-							<input type="hidden" name="newPassword" value="password"> 
-							<input type="submit" value="パスワードリセット" class="button secondary"
-								onclick="return confirm('本当にパスワードをリセットしますか？（デフォルトパスワード: password）');">
+				<%-- <c:if test="${userToEdit != null}">
+					<form action="users" method="post" style="display: inline;">
+						<input type="hidden" name="action" value="reset_password">
+						<input type="hidden" name="username" value="${userToEdit.username}"> 
+						<input type="hidden" name="newPassword" value="password"> 
+						<input type="submit" value="パスワードリセット" class="button secondary"
+							onclick="return confirm('本当にパスワードをリセットしますか？（デフォルトパスワード: password）');">
 					</form>
-				</c:if>
+				</c:if> --%>
 			</div>
 		</form>
 		<p class="error-message">
@@ -88,18 +88,17 @@
 								<input type="hidden" name="action" value="toggle_enabled">
 								<input type="hidden" name="username" value="${u.username}">
 								<input type="hidden" name="enabled" value="${!u.enabled}">
-								<input type="submit" value="
-									<c:choose><c:when test="${u.enabled}">無効化</c:when><c:otherwise>有効化</c:otherwise></c:choose>"class="button 
-									<c:choose><c:when test="${u.enabled}">danger</c:when><c:otherwise>secondary</c:otherwise></c:choose>"onclick="return confirm('本当にこのユーザーを
-									<c:choose><c:when test="${u.enabled}">無効</c:when><c:otherwise>有効</c:otherwise></c:choose>にしますか？');">
+								<input type="submit" 
+									value="<c:choose><c:when test="${u.enabled}">無効化</c:when><c:otherwise>有効化</c:otherwise></c:choose>"
+									class="button <c:choose><c:when test="${u.enabled}">danger</c:when><c:otherwise>secondary</c:otherwise></c:choose>"
+									onclick="return confirm('本当にこのユーザーを<c:choose><c:when test="${u.enabled}">無効</c:when><c:otherwise>有効</c:otherwise></c:choose>にしますか？');">
 							</form>
 						</td>
 						<td class="table-actions">
-						<a href="users?action=edit&username=${u.username}" class="button">
-								編集</a>
+						<a href="users?action=edit&username=${u.username}" class="button">編集</a>
 							<form action="users" method="post" style="display: inline;">
-								<input type="hidden" name="action" value="delete"> <input
-									type="hidden" name="username" value="${u.username}"> 
+								<input type="hidden" name="action" value="delete"> 
+								<input type="hidden" name="username" value="${u.username}"> 
 									<input type="submit" value="削除" class="button danger" onclick="return confirm('本当にこのユーザーを削除しますか？');">
 							</form>
 						</td>

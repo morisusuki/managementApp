@@ -10,7 +10,7 @@ public class Attendance {
 //	public Attendance(String userId) {
 //		this.userId = userId;
 //	}
-	public Attendance(String userId, Object checkInTime, Object checkOutTime) {
+	public Attendance(String userId, LocalDateTime checkInTime, LocalDateTime checkOutTime) {
 		this.userId = userId;
 		this.checkInTime = checkInTime;
 		this.checkOutTime = checkOutTime;

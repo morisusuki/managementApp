@@ -10,13 +10,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.example.attendance.dto.Attendance;
 public class AttendanceDAO {
 	
 	//	従業員の内容を呼び出すattendanceがいっぱい入ってるリスト
-	private static final List<Attendance> attendanceRecords = new CopyOnWriteArrayList<>();
+//	private static final List<Attendance> attendanceRecords = new CopyOnWriteArrayList<>();
 	
 	public void checkIn(String userId) throws SQLException {
 //		Attendance attendance = new Attendance(userId);
@@ -35,11 +34,6 @@ public class AttendanceDAO {
 	}
 	
 	public void checkOut(String userId) throws SQLException {
-//		attendanceRecords.stream()
-//		.filter(att -> userId.equals(att.getUserId()) && att.getCheckOutTime() == null)
-//		.findFirst()
-//		.ifPresent(att -> att.setCheckOutTime(LocalDateTime.now()));
-		
 		//名前で検索,最新のやつ持ってくる,checkOutTime==null確認する
 		String sql = "UPDATE attendance SET checkouttime = ? WHERE userid = ? AND checkouttime IS NULL ORDER BY checkintime DESC LIMIT 1";
 		try (Connection con = DB.getConnection(); 
@@ -54,9 +48,6 @@ public class AttendanceDAO {
 	
 	//指定ユーザーの勤怠履歴をリストで取得
 	public List<Attendance> findByUserId(String userId) throws SQLException {
-//		return attendanceRecords.stream()
-//				.filter(att -> userId.equals(att.getUserId()))
-//				.collect(Collectors.toList());
 		String sql = "SELECT * FROM attendance WHERE userid=? ORDER BY checkintime DESC";
 		try (Connection con = DB.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 			ps.setString(1, userId);
@@ -92,33 +83,25 @@ public class AttendanceDAO {
 	//条件検索(ユーザーID、出勤時間、退勤時間)
 	public List<Attendance> findFilteredRecords(String userId, LocalDate startDate, 
 												LocalDate endDate) throws SQLException {
-//		return attendanceRecords.stream()
-//				.filter(att -> (userId == null || userId.isEmpty() || att.getUserId().equals(userId)))
-//				.filter(att -> (startDate == null || (att.getCheckInTime() != null
-//				&& !att.getCheckInTime().toLocalDate().isBefore(startDate))))
-//				.filter(att -> (endDate == null || (att.getCheckInTime() != null
-//				&& !att.getCheckInTime().toLocalDate().isAfter(endDate))))
-//				.collect(Collectors.toList());
-		
-		String sql_u = null;
-		String sql_s = null;
-		String sql_e = null;
-		if (userId != null || !userId.isEmpty()) { sql_u = "AND userid=?"; }
-		if (startDate != null) { sql_s = "AND checkintime>=?"; }
-		if (endDate != null) { sql_e = "AND checkintime<=?"; }
-		String sql = "SELECT * FROM attendance WHERE 1=1" + sql_u + sql_s + sql_e;
+		boolean sql_u = false;
+		boolean sql_s = false;
+		boolean sql_e = false;
+		String sql = "SELECT * FROM attendance WHERE 1=1 ";
+		if (userId != null) { sql += "AND userid=? "; sql_u = true; }
+		if (startDate != null) { sql += "AND checkintime>=? "; sql_s = true; }
+		if (endDate != null) { sql += "AND checkintime<=?"; sql_e = true; }
 		
 		try (Connection con = DB.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 			int i = 1;
-			if (sql_u != null) {
+			if (sql_u) {
 				ps.setString(i, userId);
 				i += 1;
 			}
-			if (sql_s != null) {
+			if (sql_s) {
 				ps.setTimestamp(i, Timestamp.valueOf(startDate.atStartOfDay()));
 				i += 1;
 			}
-			if (sql_e != null) {
+			if (sql_e) {
 				ps.setTimestamp(i, Timestamp.valueOf(endDate.atStartOfDay()));
 			}
 			ResultSet rs = ps.executeQuery();
@@ -133,25 +116,34 @@ public class AttendanceDAO {
 		return null;
 	}
 	
-	//月単位の総労働時間の計算
-	public Map<String, Long> getMonthlyWorkingHours(String userId) throws SQLException {
-//		return attendanceRecords.stream()
-//				.filter(att -> userId == null || userId.isEmpty() || att.getUserId().equals(userId))
-//				.filter(att -> att.getCheckInTime() != null && att.getCheckOutTime() != null)
-//				.collect(Collectors.groupingBy(
-//						att -> YearMonth.from(att.getCheckInTime()),
-//						Collectors.summingLong(att -> ChronoUnit.HOURS.between(att.getCheckInTime(),
-//								att.getCheckOutTime()))
-//						));
-		String sql_u = null;
-		if (userId != null || !userId.isEmpty()) { sql_u = "AND userid=?"; }
-		String sql = "SELECT to_char(checkintime, 'YYYY/MM') as month ,"
-//				+ "to_char(sum(checkouttime - checkintime), 'HH:MI:SS')"
-				+ "sum(extract(epoch from(checkouttime - checkintime))/3600) as count"
-				+ "FROM attendance "+ sql_u + "group by month" ;
+	// オリジナル　ユーザー一人当たりの総労働時間 X 全員分
+	public Map<String, Long> totalHoursByUser() {
+		String sql = "SELECT userid, sum(extract(epoch from(checkouttime - checkintime))/3600) as count FROM attendance GROUP by userid";
 		
 		try (Connection con = DB.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-			if (sql_u != null) {
+			ResultSet rs = ps.executeQuery();
+			Map<String,Long> list= new HashMap<>();
+			while (rs.next()) {
+				list.put(rs.getString("userid"), rs.getLong("count"));
+			}
+			return list;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	//月単位の総労働時間の計算
+	public Map<String, Long> getMonthlyWorkingHours(String userId) 
+											throws SQLException {
+
+		String sql = "SELECT to_char(checkintime, 'YYYY/MM') as month ,sum(extract(epoch from(checkouttime - checkintime))/3600) as count FROM attendance ";
+		if (userId != null) { sql += "AND userid=?"; }
+		sql += "group by month";
+//				+ "to_char(sum(checkouttime - checkintime), 'HH:MI:SS')"
+		
+		try (Connection con = DB.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+			if (userId != null) {
 				ps.setString(1, userId);
 			}
 			ResultSet rs = ps.executeQuery();
@@ -176,15 +168,13 @@ public class AttendanceDAO {
 //						att -> YearMonth.from(att.getCheckInTime()),
 //						Collectors.counting()
 //						));
-		String sql_u = null;
-		if (userId != null || !userId.isEmpty()) { sql_u = "AND userid=?"; }
-		String sql = "SELECT to_char(checkintime, 'YYYY/MM') as month ,"
+		String sql = "SELECT to_char(checkintime, 'YYYY/MM') as month ,count(userid) as count FROM attendance ";
+		if (userId != null) { sql += "AND userid=?"; }
+		sql += "group by month" ;
 //				+ "to_char(sum(checkouttime - checkintime), 'HH:MI:SS')"
-				+ "count(userid) as count"
-				+ "FROM attendance "+ sql_u + "group by month" ;
 		
 		try (Connection con = DB.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-			if (sql_u != null) {
+			if (userId != null) {
 				ps.setString(1, userId);
 			}
 			ResultSet rs = ps.executeQuery();
@@ -231,8 +221,7 @@ public class AttendanceDAO {
 //		}
 //		return false;
 		
-		String sql = "UPDATE attendance SET checkintime = ?, checkouttime=? "
-					+ "WHERE userid = ? AND checkintime=?";
+		String sql = "UPDATE attendance SET checkintime = ?, checkouttime=? WHERE userid = ? AND checkintime=?";
 		try (Connection con = DB.getConnection(); 
 				PreparedStatement ps = con.prepareStatement(sql)){
 			ps.setTimestamp(1, Timestamp.valueOf(newCheckIn));
@@ -272,10 +261,16 @@ public class AttendanceDAO {
 	
 	// return用のやつ
 	private Attendance map(ResultSet rs) throws SQLException {
-//		LocalDateTime in = (rs.getTimestamp("checkintime").toLocalDateTime() != null) ? rs.getTimestamp("checkintime").toLocalDateTime() : null;
-	    Attendance at = new Attendance(rs.getString("userid"), 
-	    					rs.getTimestamp("checkintime").toLocalDateTime(), 
-	    					rs.getTimestamp("checkouttime").toLocalDateTime());
-	    return at;
+		if (rs.getTimestamp("checkouttime") != null) {
+			Attendance at = new Attendance(rs.getString("userid"), 
+					rs.getTimestamp("checkintime").toLocalDateTime(), 
+					rs.getTimestamp("checkouttime").toLocalDateTime());	
+			return at;
+		} else {
+			Attendance at = new Attendance(rs.getString("userid"), 
+					rs.getTimestamp("checkintime").toLocalDateTime(), 
+					null);	
+			return at;
+		}
 	}
 }

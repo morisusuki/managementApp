@@ -87,12 +87,13 @@ public class UserDAO {
 	//既存ユーザー情報の更新
 	public void updateUser(User user, User oldUser)  throws SQLException{
 //		users.put(user.getUsername(), user);
-		String sql = "UPDATE users SET username = ?, role = ?, enabled = ? WHERE username = ?";
+		String sql = "UPDATE users SET username = ?, password=?, role = ?, enabled = ? WHERE username = ?";
 		try (Connection con = DB.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 			ps.setString(1, user.getUsername());
-			ps.setString(2, user.getRole());
-			ps.setBoolean(3, user.isEnabled());
-			ps.setString(4, oldUser.getUsername());
+			ps.setString(2, user.getPassword());
+			ps.setString(3, user.getRole());
+			ps.setBoolean(4, user.isEnabled());
+			ps.setString(5, oldUser.getUsername());
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -111,22 +112,22 @@ public class UserDAO {
 		}
 	}
 	
-	//新しいパスワードを設定
-	public void resetPassword(String username, String newPassword)  throws SQLException{
-//		User user = users.get(username);
-//		if (user != null) {
-//			users.put(username, new User(user.getUsername(), hashPassword(newPassword), user.getRole(),
-//					user.isEnabled()));
+	//新しいパスワードを設定 今の所ボツ
+//	public void resetPassword(String username, String newPassword)  throws SQLException{
+////		User user = users.get(username);
+////		if (user != null) {
+////			users.put(username, new User(user.getUsername(), hashPassword(newPassword), user.getRole(),
+////					user.isEnabled()));
+////		}
+//		String sql = "UPDATE users SET password = ? WHERE username = ?";
+//		try (Connection con = DB.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+//			ps.setString(1, newPassword);
+//			ps.setString(2, username);
+//			ps.executeUpdate();
+//		} catch (SQLException e) {
+//			e.printStackTrace();
 //		}
-		String sql = "UPDATE users SET password = ? WHERE username = ?";
-		try (Connection con = DB.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-			ps.setString(1, newPassword);
-			ps.setString(2, username);
-			ps.executeUpdate();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
+//	}
 	
 	//ユーザーアカウントの有効/無効を切り替える
 	public void toggleUserEnabled(String username, boolean enabled)  throws SQLException{

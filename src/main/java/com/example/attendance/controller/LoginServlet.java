@@ -1,8 +1,8 @@
 package com.example.attendance.controller;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpSession;
 
 import com.example.attendance.dao.AttendanceDAO;
 import com.example.attendance.dao.UserDAO;
+import com.example.attendance.dto.Attendance;
 import com.example.attendance.dto.User;
 
 @WebServlet("/login")
@@ -29,12 +30,7 @@ public class LoginServlet extends HttpServlet {
 			String username = req.getParameter("username");
 			String password = req.getParameter("password");
 			User user = userDAO.findByUsername(username);
-//			確認用
-//			if (user != null) {
-//				System.out.println("ユーザー存在あり");
-//			} else {
-//				System.out.println("存在なし");
-//			}
+
 			if (user != null && user.isEnabled() && userDAO.verifyPassword(username,password)) {
 				HttpSession session = req.getSession();
 				session.setAttribute("user", user);
@@ -42,20 +38,19 @@ public class LoginServlet extends HttpServlet {
 				
 				if ("admin".equals(user.getRole())) {
 					req.setAttribute("allAttendanceRecords", attendanceDAO.findAll());
-					Map<String, Long> totalHoursByUser = 
-							attendanceDAO.findAll().stream().collect(
-								Collectors.groupingBy(com.example.attendance.dto.Attendance::getUserId, 
-									Collectors.summingLong(att -> {
-										if (att.getCheckInTime() != null && att.getCheckOutTime() != null) {
-											return java.time.temporal.ChronoUnit.HOURS.between(
-													att.getCheckInTime(),att.getCheckOutTime());
-										}
-										return 0L;
-									})));
+					List<Attendance> filteredRecords = attendanceDAO.findFilteredRecords(null, null, null);
+					req.setAttribute("allAttendanceRecords", filteredRecords);
+					Map<String, Long> totalHoursByUser = attendanceDAO.getMonthlyWorkingHours(null);
 					req.setAttribute("totalHoursByUser", totalHoursByUser);
+					req.setAttribute("monthlyWorkingHours",
+							attendanceDAO.getMonthlyWorkingHours(null));
+					req.setAttribute("monthlyCheckInCounts",
+							attendanceDAO.getMonthlyCheckInCounts(null));
 					RequestDispatcher rd = req.getRequestDispatcher("/jsp/admin_menu.jsp");
 					rd.forward(req, resp);
 				} else {
+					//のちのちgetMonthlyWorkingHoursも導入したい
+					//	attendanceDAO.getMonthlyWorkingHours(username);
 					req.setAttribute("attendanceRecords",attendanceDAO.findByUserId(user.getUsername()));
 					RequestDispatcher rd = req.getRequestDispatcher("/jsp/employee_menu.jsp");
 					rd.forward(req, resp);
@@ -67,6 +62,7 @@ public class LoginServlet extends HttpServlet {
 					}
 		} catch (SQLException e) {
 			e.printStackTrace();
+
 			req.setAttribute("errorMessage","エラーが発生しました");
 			RequestDispatcher rd = req.getRequestDispatcher("/login.jsp");
 			rd.forward(req, resp);

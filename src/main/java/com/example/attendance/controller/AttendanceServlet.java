@@ -8,7 +8,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -61,18 +60,30 @@ public class AttendanceServlet extends HttpServlet {
 				} catch (DateTimeParseException e) {
 					req.setAttribute("errorMessage", "日付の形式が不正です。");
 				}
+				System.out.println("filterUserId :" + filterUserId);
+				if (filterUserId != null && filterUserId.isEmpty()) { filterUserId = null;}
+				if (filterUserId != null && startDateStr.isEmpty()) { startDate = null;}
+				if (filterUserId != null && endDateStr.isEmpty()) { endDate = null;}
 				List<Attendance> filteredRecords = attendanceDAO.findFilteredRecords(filterUserId,
 						startDate, endDate);
+				System.out.println(filteredRecords);
 				req.setAttribute("allAttendanceRecords", filteredRecords);
-				Map<String, Long> totalHoursByUser = filteredRecords.stream()
-						.collect(Collectors.groupingBy(Attendance::getUserId,
-								Collectors.summingLong(att -> {
-									if (att.getCheckInTime() != null && att.getCheckOutTime() != null) {
-										return
-												java.time.temporal.ChronoUnit.HOURS.between(att.getCheckInTime(), att.getCheckOutTime());
-									}
-									return 0L;
-								})));
+				Map<String, Long> totalHoursByUser = attendanceDAO.totalHoursByUser();
+//						filteredRecords.stream()
+//						.collect(Collectors.groupingBy(Attendance::getUserId,
+//								Collectors.summingLong(att -> {
+//									if (att.getCheckInTime() != null && att.getCheckOutTime() != null) {
+//										return
+//												java.time.temporal.ChronoUnit.HOURS.between(att.getCheckInTime(), att.getCheckOutTime());
+//									}
+//									return 0L;
+//								})));
+				// テスト
+//				if (totalHoursByUser == null) {
+//					System.out.println("null");
+//				} else {
+//					System.out.println("not null");
+//				}
 				req.setAttribute("totalHoursByUser", totalHoursByUser);
 				req.setAttribute("monthlyWorkingHours",
 						attendanceDAO.getMonthlyWorkingHours(filterUserId));
@@ -83,16 +94,25 @@ public class AttendanceServlet extends HttpServlet {
 			} else {
 				if ("admin".equals(user.getRole())) {
 					req.setAttribute("allAttendanceRecords", attendanceDAO.findAll());
-					Map<String, Long> totalHoursByUser = attendanceDAO.findAll().stream()
-							.collect(Collectors.groupingBy(Attendance::getUserId,
-									Collectors.summingLong(att -> {
-										if (att.getCheckInTime() != null && att.getCheckOutTime() != null)
-										{
-											return
-													java.time.temporal.ChronoUnit.HOURS.between(att.getCheckInTime(), att.getCheckOutTime());
-										}
-										return 0L;
-									})));
+					Map<String, Long> totalHoursByUser = attendanceDAO.totalHoursByUser();
+//							attendanceDAO.findAll().stream()
+//							.collect(Collectors.groupingBy(Attendance::getUserId,
+//									Collectors.summingLong(att -> {
+//										if (att.getCheckInTime() != null && att.getCheckOutTime() != null)
+//										{
+//											return
+//													java.time.temporal.ChronoUnit.HOURS.between(att.getCheckInTime(), att.getCheckOutTime());
+//										}
+//										return 0L;
+//									})));
+					// テスト
+//					if (totalHoursByUser == null) {
+//						System.out.println("null");
+//					} else {
+//						System.out.println("not null");
+//					}
+					List<Attendance> filteredRecords = attendanceDAO.findFilteredRecords(null, null, null);
+					req.setAttribute("allAttendanceRecords", filteredRecords);
 					req.setAttribute("totalHoursByUser", totalHoursByUser);
 					req.setAttribute("monthlyWorkingHours",
 							attendanceDAO.getMonthlyWorkingHours(null));
