@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,16 +18,15 @@ public class AttendanceDAO {
 	//	従業員の内容を呼び出すattendanceがいっぱい入ってるリスト
 //	private static final List<Attendance> attendanceRecords = new CopyOnWriteArrayList<>();
 	
-	public void checkIn(String userId) throws SQLException {
-//		Attendance attendance = new Attendance(userId);
-//		attendance.setCheckInTime(LocalDateTime.now());
-//		attendanceRecords.add(attendance);
-		
+	public void checkIn(String userId) throws SQLException {		
 		String sql = "INSERT INTO attendance(userid, checkintime) VALUES(?,?)";
 		try (Connection con = DB.getConnection(); 
 				PreparedStatement ps = con.prepareStatement(sql)){
 			ps.setString(1, userId);
-			ps.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now()));
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+			String nowTimeStr =  LocalDateTime.now().format(formatter);
+			LocalDateTime nowTime = LocalDateTime.parse(nowTimeStr, formatter);
+			ps.setTimestamp(2, Timestamp.valueOf(nowTime));
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -35,10 +35,13 @@ public class AttendanceDAO {
 	
 	public void checkOut(String userId) throws SQLException {
 		//名前で検索,最新のやつ持ってくる,checkOutTime==null確認する
-		String sql = "UPDATE attendance SET checkouttime = ? WHERE userid = ? AND checkouttime IS NULL ORDER BY checkintime DESC LIMIT 1";
+		String sql = "UPDATE attendance SET checkouttime=? WHERE checkintime = (SELECT checkintime FROM attendance WHERE userid = ? AND checkouttime IS NULL ORDER BY checkintime DESC LIMIT 1)";
 		try (Connection con = DB.getConnection(); 
 				PreparedStatement ps = con.prepareStatement(sql)){
-			ps.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+			String nowTimeStr =  LocalDateTime.now().format(formatter);
+			LocalDateTime nowTime = LocalDateTime.parse(nowTimeStr, formatter);
+			ps.setTimestamp(1, Timestamp.valueOf(nowTime));
 			ps.setString(2, userId);
 			ps.executeUpdate();
 		} catch (SQLException e) {
