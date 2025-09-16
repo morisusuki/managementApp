@@ -1,6 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -9,6 +9,11 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+	<form action="schedule" method="get" class="filter-form">
+		<input type="month" id="startDate" name="date" 
+			value="<c:out value="${param.date}"/>">
+			<button type="submit" class="button">適用</button>
+	</form>
 
 	<table>
 		<thead>
@@ -18,13 +23,14 @@
 			</tr>
 		</thead>
 		<tbody>
-			<c:forEach var="sc" items="${scheduleList}">
+			<c:forEach var="schedule" items="${scheduleList}">
 				<tr>
-					<td>${sc.userId}</td>
-					<td>${sc.ScheduleDate}</td>				
-					<%-- <fmt:parseDate value="${sc.ScheduleDate}" pattern="yyyy-MM-dd" var="date" type="date" /> --%>
-					<%-- <fmt:formatDate value="${date}" var="newdate" type="date" pattern="yyyy/MM/dd" /> --%>
-					<p>${date}</p>
+					<%-- <td><c:out value="${sc}"/></td> --%>
+					<td>${schedule.userId}</td> 
+<%-- 					<td>${schedule.scheduleDate}</td> --%>
+ 					<fmt:parseDate value="${schedule.scheduleDate}" pattern="yyyy-MM-dd'T'HH:mm" var="scDate" type="date"/>
+					<fmt:formatDate value="${scDate}" var="newScDate" type="date" pattern="yyyy/MM/dd HH:mm" />
+					<td>${newScDate}</td>
  				</tr>
 			</c:forEach>
 			<c:if test="${empty scheduleList}">

@@ -4,15 +4,15 @@ import java.time.LocalDateTime;
 public class Schedule {
 	
 	private String userId;
-	private LocalDateTime ScheduleDate;
+	private LocalDateTime scheduleDate;
 	
 	public Schedule(String userId, LocalDateTime date) {
 		this.userId = userId;
-		this.ScheduleDate = date;
+		this.scheduleDate = date;
 	}
 
 	public void setDate(LocalDateTime date) {
-		this.ScheduleDate = date;
+		this.scheduleDate = date;
 	}
 
 	public String getUserId() {
@@ -20,15 +20,15 @@ public class Schedule {
 	}
 	
 	public LocalDateTime getScheduleDate() {
-		return ScheduleDate;
+		return scheduleDate;
 	}
 	
 	public int getScheduleYear() {
-		return ScheduleDate.getYear();
+		return scheduleDate.getYear();
 	}
 	
 	public int getScheduleMonth() {
-		return ScheduleDate.getMonth().getValue();
+		return scheduleDate.getMonth().getValue();
 	}
 		
 }

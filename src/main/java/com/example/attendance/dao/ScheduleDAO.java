@@ -1,11 +1,14 @@
 package com.example.attendance.dao;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collectors;
 
 //import com.example.attendance.dto.Attendance;
 import com.example.attendance.dto.Schedule;
@@ -36,43 +39,82 @@ public class ScheduleDAO {
 	
 	//　スケジュール追加
 	public void setSchedule(String userId, LocalDateTime date) {
-		Schedule schedule = new Schedule(userId, date);
-		scheduleList.add(schedule);
+//		Schedule schedule = new Schedule(userId, date);
+//		scheduleList.add(schedule);
+		
+		String sql = "INSERT INTO schedule(userid, scheduledate) VALUES(?,?)";
+		try (Connection con = DB.getConnection(); 
+				PreparedStatement ps = con.prepareStatement(sql)){
+			ps.setString(1, userId);
+			ps.setTimestamp(2, Timestamp.valueOf(date));
+			ps.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
 	}
-	//　スケジュール変更	
+	//　スケジュール変更(ユーザーの変更はできない)
 	public boolean changeSchedule(String userId, LocalDateTime oldDate, LocalDateTime newDate) {
-		for (int i = 0; i < scheduleList.size(); i++) {
-			Schedule sc = scheduleList.get(i);
-			if (sc.getUserId().equals(userId) && sc.getScheduleDate().equals(oldDate)) {
-				sc.setDate(newDate);
-				return true;
-			}
+		
+		String sql = "UPDATE schedule SET scheduledate = ? WHERE userid = ? AND scheduledate = ?";
+		try (Connection con = DB.getConnection(); 
+				PreparedStatement ps = con.prepareStatement(sql)){
+			ps.setTimestamp(1, Timestamp.valueOf(newDate));
+			ps.setString(2, userId);
+			ps.setTimestamp(3, Timestamp.valueOf(oldDate));
+			ps.executeUpdate();
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
 		return false;
 	}
 	//　スケジュール削除
 	public boolean deleteSchedule(String userId, LocalDateTime date) {
-		return scheduleList.removeIf(sc -> 
-				sc.getUserId().equals(userId) && 
-				sc.getScheduleDate().equals(date));
+//		return scheduleList.removeIf(sc -> 
+//				sc.getUserId().equals(userId) && 
+//				sc.getScheduleDate().equals(date));
+		
+		String sql = "DELETE FROM schedule WHERE userid = ? AND scheduledate = ?";
+		try (Connection con = DB.getConnection(); 
+			PreparedStatement ps = con.prepareStatement(sql)){
+			ps.setString(1, userId);
+			ps.setTimestamp(2, Timestamp.valueOf(date));
+			ps.executeUpdate();
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
-	//　全日程渡し
-	public List<Schedule> allSchedule() {
-		return new ArrayList<>(scheduleList);
+	//　月単位で日程渡し
+	public List<Schedule> monthSchedule(String userId, String date) {
+//		return new ArrayList<>(scheduleList);
+		String sql = "select * from schedule where userid = ? AND to_char(scheduledate,'yyyy-mm-dd') like ?";
+		try (Connection con = DB.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+			ps.setString(1, userId);
+			ps.setString(2, date);
+			ResultSet rs = ps.executeQuery();
+			List<Schedule> list= new ArrayList<>();
+			while (rs.next()) {
+//				System.out.println("test");
+				list.add(map(rs));
+			}
+			return list;
+		} catch (SQLException e) {
+				e.printStackTrace();
+		}
+		return null;
 	}
-	//	今の月の日程
-	public List<Schedule> monthSchedule() {
-//		今の年を取得　　
-		int year = LocalDateTime.now().getYear();
-//		今の月を取得　　
-		int month = LocalDateTime.now().getMonth().getValue();
-//		Comparator<Schedule> comparator = 
-//				Comparator.comparing(Schedule::getScheduleDate).reversed();
-		return scheduleList.stream().filter(sc -> 
-					   (sc.getScheduleYear() == year && 
-					   sc.getScheduleMonth() == month))
-				.sorted(Comparator.comparing(Schedule::getScheduleDate))
-				.collect(Collectors.toList());
+	
+	// return用のやつ
+	private Schedule map(ResultSet rs) throws SQLException {
+
+		Schedule sc = new Schedule(rs.getString("userid"), 
+				rs.getTimestamp("ScheduleDate").toLocalDateTime());	
+//		System.out.println(rs.getString("userid") + rs.getTimestamp("ScheduleDate").toLocalDateTime());
+		return sc;
+
 	}
 
 }

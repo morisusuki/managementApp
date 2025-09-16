@@ -121,6 +121,9 @@ public class AttendanceServlet extends HttpServlet {
 				} else {
 					req.setAttribute("attendanceRecords",
 							attendanceDAO.findByUserId(user.getUsername()));
+					for (Attendance att: attendanceDAO.findByUserId(user.getUsername())){
+						System.out.println(att);
+					}
 					RequestDispatcher rd = req.getRequestDispatcher("/jsp/employee_menu.jsp");
 					rd.forward(req, resp);
 				}
