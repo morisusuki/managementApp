@@ -90,7 +90,7 @@ public class ScheduleDAO {
 	//　月単位で日程渡し
 	public List<Schedule> monthSchedule(String userId, String date) {
 //		return new ArrayList<>(scheduleList);
-		String sql = "select * from schedule where userid = ? AND to_char(scheduledate,'yyyy-mm-dd') like ?";
+		String sql = "select * from schedule where userid = ? AND to_char(scheduledate,'yyyy-mm-dd') like ? ORDER BY scheduledate";
 		try (Connection con = DB.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 			ps.setString(1, userId);
 			ps.setString(2, date);
@@ -98,6 +98,24 @@ public class ScheduleDAO {
 			List<Schedule> list= new ArrayList<>();
 			while (rs.next()) {
 //				System.out.println("test");
+				list.add(map(rs));
+			}
+			return list;
+		} catch (SQLException e) {
+				e.printStackTrace();
+		}
+		return null;
+	}
+	//	全日程渡し
+	public List<Schedule> allSchedule(String date) {
+//		return new ArrayList<>(scheduleList);
+		String sql = "select * from schedule WHERE to_char(scheduledate,'yyyy-mm-dd') like ? ORDER BY scheduledate";
+		try (Connection con = DB.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+			ps.setString(1, date);
+			ResultSet rs = ps.executeQuery();
+			List<Schedule> list= new ArrayList<>();
+			while (rs.next()) {
+				
 				list.add(map(rs));
 			}
 			return list;

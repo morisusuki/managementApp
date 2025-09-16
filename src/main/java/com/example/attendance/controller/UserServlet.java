@@ -25,18 +25,18 @@ public class UserServlet extends HttpServlet {
 			String action = req.getParameter("action");
 			HttpSession session = req.getSession(false);
 			User currentUser = (User) session.getAttribute("user");
-					if (currentUser == null || !"admin".equals(currentUser.getRole())) {
-						resp.sendRedirect("login.jsp");
-						return;
-					}
-					// Retrieve and clear message from session
-					String message = (String) session.getAttribute("successMessage");
-					if (message != null) {
-						req.setAttribute("successMessage", message);
-						session.removeAttribute("successMessage");
-					}
-					if ("list".equals(action) || action == null) {
-						Collection<User> users = userDAO.getAllUsers();
+			if (currentUser == null || !"admin".equals(currentUser.getRole())) {
+				resp.sendRedirect("login.jsp");
+				return;
+			}
+			// Retrieve and clear message from session
+			String message = (String) session.getAttribute("successMessage");
+			if (message != null) {
+				req.setAttribute("successMessage", message);
+				session.removeAttribute("successMessage");
+			}
+			if ("list".equals(action) || action == null) {
+				Collection<User> users = userDAO.getAllUsers();
 //　確認用
 //						if (users != null) {
 //							System.out.println("users存在あり");
@@ -44,22 +44,22 @@ public class UserServlet extends HttpServlet {
 //							System.out.println("users存在なし");
 //						}
 //						
-						req.setAttribute("users", users);
-						RequestDispatcher rd =
-								req.getRequestDispatcher("/jsp/user_management.jsp");
-						rd.forward(req, resp);
-					} else if ("edit".equals(action)) {
-						String username = req.getParameter("username");
-						User user = userDAO.findByUsername(username);
-						req.setAttribute("userToEdit", user);
-						Collection<User> users = userDAO.getAllUsers();
-						req.setAttribute("users", users);
-						RequestDispatcher rd =
-								req.getRequestDispatcher("/jsp/user_management.jsp");
-						rd.forward(req, resp);
-					} else {
-						resp.sendRedirect("users?action=list");
-					}
+				req.setAttribute("users", users);
+				RequestDispatcher rd =
+						req.getRequestDispatcher("/jsp/user_management.jsp");
+				rd.forward(req, resp);
+			} else if ("edit".equals(action)) {
+				String username = req.getParameter("username");
+				User user = userDAO.findByUsername(username);
+				req.setAttribute("userToEdit", user);
+				Collection<User> users = userDAO.getAllUsers();
+				req.setAttribute("users", users);
+				RequestDispatcher rd =
+						req.getRequestDispatcher("/jsp/user_management.jsp");
+				rd.forward(req, resp);
+			} else {
+				resp.sendRedirect("users?action=list");
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 			req.setAttribute("errorMessage","エラーが発生しました");
@@ -109,8 +109,8 @@ public class UserServlet extends HttpServlet {
 						}
 					} else if ("delete".equals(action)) {
 						String username = req.getParameter("username");
-								userDAO.deleteUser(username);
-								session.setAttribute("successMessage","ユーザーを削除しました。");
+						userDAO.deleteUser(username);
+						session.setAttribute("successMessage","ユーザーを削除しました。");
 //					} else if ("reset_password".equals(action)) {
 //						System.out.println("test1");
 //						String username = req.getParameter("username");

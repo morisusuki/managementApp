@@ -181,8 +181,8 @@ public class AttendanceServlet extends HttpServlet {
 								LocalDateTime.parse(req.getParameter("newCheckOutTime")) : null;
 				if (attendanceDAO.updateManualAttendance(userId, oldCheckIn, oldCheckOut,
 						newCheckIn, newCheckOut)) {
-				} else {
 					session.setAttribute("successMessage", "勤怠記録を手動で更新しました。");
+				} else {
 					session.setAttribute("errorMessage", "勤怠記録の更新に失敗しました。");
 				}
 			} else if ("delete_manual".equals(action) && "admin".equals(user.getRole())) {

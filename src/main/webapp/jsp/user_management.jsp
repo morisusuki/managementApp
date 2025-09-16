@@ -24,7 +24,8 @@
 		<h2>ユーザー追加/編集</h2>
 		<form action="users" method="post" class="user-form">
 			<input type="hidden" name="action"
-				value="<c:choose><c:when test="${userToEdit != null}">update</c:when><c:otherwise>add</c:otherwise></c:choose>">
+				value="<c:choose><c:when test="${userToEdit != null}">update</c:when><c:
+>add</c:otherwise></c:choose>">
 			<c:if test="${userToEdit != null}">
 				<input type="hidden" name="username" value="${userToEdit.username}">
 			</c:if>
@@ -95,7 +96,7 @@
 							</form>
 						</td>
 						<td class="table-actions">
-						<a href="users?action=edit&username=${u.username}" class="button">編集</a>
+							<a href="users?action=edit&username=${u.username}" class="button">編集</a>
 							<form action="users" method="post" style="display: inline;">
 								<input type="hidden" name="action" value="delete"> 
 								<input type="hidden" name="username" value="${u.username}"> 
