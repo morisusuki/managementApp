@@ -39,16 +39,16 @@ public class ScheduleServlet extends HttpServlet {
 			session.removeAttribute("message");
 		}
 		
-		User user = (User) session.getAttribute("user");		
-		if (user == null) {
-			resp.sendRedirect("login.jsp");
-			return;
-		}
-		
+		User user = (User) session.getAttribute("user");
+		boolean login = false;
 		boolean admin_check = false;
-		if (user.getRole().equals("admin")) {
-			admin_check = true;
+		if (user != null) {
+			login = true;
+			if (user.getRole().equals("admin")) {
+				admin_check = true;
+			}
 		}
+		req.setAttribute("login", login);
 
 		String dateStr = req.getParameter("date");
 		if (dateStr == null || dateStr.isEmpty()) {
@@ -58,11 +58,19 @@ public class ScheduleServlet extends HttpServlet {
 		}
 		dateStr += "%";
 		
-//		従業員用ページ
+//		従業員,未ログイン用ページ
 		if (!admin_check) {
-			List<Schedule> scheduleList = scheduleDAO.monthSchedule(user.getUsername(), dateStr);
+//	従業員用リスト
+			if (login) {
+				List<Schedule> scheduleList = scheduleDAO.monthSchedule(user.getUsername(), dateStr);
+				req.setAttribute("scheduleList", scheduleList);
+			}
+//	未ログイン用リスト
+			else {
+				List<Schedule> scheduleList = scheduleDAO.allSchedule(dateStr);
+				req.setAttribute("scheduleList", scheduleList);
+			}
 			req.setAttribute("admin_check", admin_check);
-			req.setAttribute("scheduleList", scheduleList);
 			RequestDispatcher rd = req.getRequestDispatcher("/jsp/schedule_list.jsp");
 			rd.forward(req, resp);
 		}
@@ -184,9 +192,9 @@ public class ScheduleServlet extends HttpServlet {
 //ステップ4　完了
 //	ログイン済みなら次の自分のシフトがいつかを表示させたい
 //	(シフトがなければ専用の表示)
-//ステップ5
+//ステップ5　完了
 //	戻る時のボタン追加
-//ステップ6
+//ステップ6　完了
 //	管理者画面で名前フィルタ
-//ステップ7
+//ステップ7　完了
 //	ログアウト時でも閲覧可能に

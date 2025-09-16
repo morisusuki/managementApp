@@ -96,7 +96,6 @@ public class UserServlet extends HttpServlet {
 									req.setAttribute("errorMessage","ユーザーID は既に存在します。");
 								}
 					} else if ("update".equals(action)) {
-						System.out.println("test1-2");
 						String username = req.getParameter("username");
 						String password = req.getParameter("password");
 						String role = req.getParameter("role");

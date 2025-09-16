@@ -49,6 +49,7 @@ input[type="password"],
 input[type="email"],
 input[type="datetime-local"],
 input[type="date"],
+input[type="month"],
 textarea,
 select {
 	width: calc(100% - 24px);
@@ -65,6 +66,7 @@ input[type="password"]:focus,
 input[type="email"]:focus,
 input[type="datetime-local"]:focus,
 input[type="date"]:focus,
+input[type="month"]:focus,
 textarea:focus,
 select:focus {
 border-color: #007bff;

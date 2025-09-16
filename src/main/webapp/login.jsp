@@ -21,6 +21,7 @@
 			</p>
 			<div class="button-group">
 				<input type="submit" value="ログイン">
+				<a href="schedule?action=schedule" class="button secondary">シフト表</a>
 			</div>
 		</form>
 		<p class="error-message">

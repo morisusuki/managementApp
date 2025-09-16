@@ -12,8 +12,9 @@
 		<h1>ユーザー管理</h1>
 		<p>ようこそ, ${user.username}さん (管理者)</p>
 		<div class="main-nav">
-			<a href="attendance?action=filter">勤怠履歴管理</a> <a
-				href="users?action=list">ユーザー管理</a> <a href="logout">ログアウト</a>
+			<a href="attendance?action=filter">勤怠履歴管理</a>  
+			<a href="schedule?action=schedule">シフト表管理</a> 
+			<a href="logout">ログアウト</a>
 		</div>
 		<c:if test="${not empty sessionScope.successMessage}">
 			<p class="success-message">
@@ -24,8 +25,7 @@
 		<h2>ユーザー追加/編集</h2>
 		<form action="users" method="post" class="user-form">
 			<input type="hidden" name="action"
-				value="<c:choose><c:when test="${userToEdit != null}">update</c:when><c:
->add</c:otherwise></c:choose>">
+				value="<c:choose><c:when test="${userToEdit != null}">update</c:when><c:otherwise>add</c:otherwise></c:choose>">
 			<c:if test="${userToEdit != null}">
 				<input type="hidden" name="username" value="${userToEdit.username}">
 			</c:if>

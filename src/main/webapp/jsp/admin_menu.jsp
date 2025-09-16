@@ -12,7 +12,8 @@
 		<h1>管理者メニュー</h1>
 		<p>ようこそ, ${user.username}さん (管理者)</p>
 		<div class="main-nav">
-			<a href="attendance?action=filter">勤怠履歴管理</a>
+		
+		
 			<a href="users?action=list">ユーザー管理</a> 
 			<a href="schedule?action=schedule">シフト表管理</a> 
 			<a href="logout">ログアウト</a>
