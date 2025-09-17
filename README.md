@@ -1,18 +1,18 @@
-###勤怠管理アプリケーション
+### 勤怠管理アプリケーション
 
 
-##◯追加機能 : シフト表の閲覧,管理機能
+## ◯追加機能 : シフト表の閲覧,管理機能
     管理者が作成したシフトを閲覧することができます。
     未ログイン時は全員分のシフトを、ログイン時は自分が入っている日のシフトを確認できます。
     また、名前/月でのフィルタリングができます。
 
-##◯主な追加ファイル : 
+## ◯主な追加ファイル : 
     ・dto/ScheduleServlet
     ・dao/ScheduleDAO
     ・controller/ScheduleServlet
     ・jsp/schedule_list
 
-##◯テーブル : 
+## ◯テーブル : 
     ・Users
         user情報を管理 : username, password, role, enabled,
     ・Attendance
@@ -20,8 +20,8 @@
     ・Schedule
         シフト日程を管理 : userid,scheduledate,
 
-###◯使用方法
-  ##1. データベース,テーブルを作成
+### ◯使用方法
+  ## 1. データベース,テーブルを作成
     CREATE DATABASE managementdb;
 
     CREATE TABLE Users(
@@ -44,7 +44,7 @@
     on update cascade
     );
 
-  ##2.初期データを追加(usersは必須、その他は任意)
+  ## 2.初期データを追加(usersは必須、その他は任意)
     INSERT INTO users(username,password,role,enabled)
     VALUES('O森','morimori','employee',true);
     INSERT INTO users(username,password,role,enabled)
@@ -70,7 +70,7 @@
     INSERT INTO schedule(userid,scheduledate)
     VALUES('T橋','2025-09-15 17:00:00');
 
-  ##3.login.jspから起動、ログイン
+  ## 3.login.jspから起動、ログイン
     ・管理者としてログイン
         ユーザーID : 管理者
         パスワード : admin
