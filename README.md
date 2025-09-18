@@ -8,6 +8,7 @@
 
 ## ◯主な追加ファイル : 
     ・dto/ScheduleServlet
+    ・model/CalendarLogic, MyCalendar
     ・dao/ScheduleDAO
     ・controller/ScheduleServlet
     ・jsp/schedule_list
